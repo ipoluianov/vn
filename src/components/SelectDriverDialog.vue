@@ -1,9 +1,8 @@
 <script setup>
-  import MainForm from './components/MainForm.vue'
 </script>
 
 <template>
-  <MainForm/>
+    DIALOG CONTENT
 </template>
 
 <style>
