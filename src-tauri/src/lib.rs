@@ -1,17 +1,22 @@
-use serde::{Deserialize, Serialize};
+mod app;
 
-// Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-#[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
-}
+use serde::{Deserialize, Serialize};
+use once_cell::sync::Lazy;
+use app::AppState;
+use std::sync::Mutex;
+
+// declre appstate
+
+// static appState: AppState;
+static APP_STATE: Lazy<Mutex<AppState>> = Lazy::new(|| Mutex::new(AppState::new()));
+
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![greet])
-        .invoke_handler(tauri::generate_handler![get_file_panel_content_as_json])
+        .invoke_handler(tauri::generate_handler![get_file_panel_content_as_json,
+             set_current_item_index])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
@@ -28,6 +33,7 @@ struct Item {
     full_path: String,
     link_path: String,
 }
+
 #[derive(Serialize, Deserialize, Debug)]
 struct FilePanelContent {
     items: Vec<Item>,
@@ -38,36 +44,14 @@ struct FilePanelContent {
 
 #[tauri::command]
 fn get_file_panel_content_as_json(index: i32) -> String {
-    let file_panel_content = FilePanelContent {
-        items: vec![
-            Item {
-                name: "file1".to_string(),
-                display_name: "file1".to_string(),
-                display_ext: "".to_string(),
-                is_dir: false,
-                size: 123,
-                modified: 123,
-                full_path: "/file1".to_string(),
-                link_path: "/file1".to_string(),
-            },
-            Item {
-                name: "file2".to_string(),
-                display_name: "file2".to_string(),
-                display_ext: "".to_string(),
-                is_dir: false,
-                size: 123,
-                modified: 123,
-                full_path: "/file2".to_string(),
-                link_path: "/file2".to_string(),
-            },
-        ],
-        current_item_index: 0,
-        panel_index: index,
-        current_path: "/".to_string(),
-    };
-    serde_json::to_string(&file_panel_content).unwrap()
+    APP_STATE.lock().unwrap().get_file_panel_content_as_json(index)
 }
 
+#[tauri::command]
+fn set_current_item_index(panel_index: i32, index: i32) {
+    APP_STATE.lock().unwrap().set_current_item_index(panel_index, index)    
+    //APP_STATE.set_current_item_index(panel_index, index)
+}
 /*
 
 type FilePanelContent struct {

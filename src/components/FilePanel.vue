@@ -121,7 +121,8 @@ window.addEventListener('keydown', async (event) => {
 
 const setCurrentItemIndex = async (index) => {
     //console.log("setCurrentItemIndex", '[' + props.panelIndex + ']', index, " isActive:", props.isActive);
-    await SetCurrentItemIndex(props.panelIndex, index);
+    //await SetCurrentItemIndex(props.panelIndex, index);
+    await invoke("set_current_item_index", { panelIndex: props.panelIndex, index: index });
     await loadContent();
 }
 
