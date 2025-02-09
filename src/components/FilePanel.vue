@@ -1,6 +1,8 @@
 <script setup>
 import { ref, reactive } from 'vue'
 
+import { invoke } from "@tauri-apps/api/core";
+
 // import { GetFilePanelContentAsJson, GoBack, MainAction, SetCurrentItemIndex, UpdateContent } from '../../wailsjs/go/main/App'
 
 const data = reactive(
@@ -65,11 +67,11 @@ window.addEventListener('keydown', async (event) => {
 
     if (event.key === 'ArrowDown') {
         event.preventDefault();
-        setCurrentItemIndex(data.content.currentItemIndex + 1);
+        setCurrentItemIndex(data.content.current_item_index + 1);
     }
     if (event.key === 'ArrowUp') {
         event.preventDefault();
-        setCurrentItemIndex(data.content.currentItemIndex - 1);
+        setCurrentItemIndex(data.content.current_item_index - 1);
     }
     if (!event.altKey && event.key == 'F2') {
         event.preventDefault();
@@ -90,11 +92,11 @@ window.addEventListener('keydown', async (event) => {
     }
     if (event.key == 'PageUp') {
         event.preventDefault();
-        setCurrentItemIndex(data.content.currentItemIndex - tableVisibleItemsCount());
+        setCurrentItemIndex(data.content.current_item_index - tableVisibleItemsCount());
     }
     if (event.key == 'PageDown') {
         event.preventDefault();
-        setCurrentItemIndex(data.content.currentItemIndex + tableVisibleItemsCount());
+        setCurrentItemIndex(data.content.current_item_index + tableVisibleItemsCount());
     }
     if (event.key == 'Home') {
         event.preventDefault();
@@ -124,36 +126,26 @@ const setCurrentItemIndex = async (index) => {
 }
 
 const loadContent = async () => {
-    /*const content = await GetFilePanelContentAsJson(props.panelIndex);
+    console.log("loadContent", props.panelIndex);
+    // greetMsg.value = await invoke("greet", { name: name.value });
+    const content = await invoke("get_file_panel_content_as_json", { index: props.panelIndex });
+    //const content = await get_file_panel_content_as_json(props.panelIndex);
+    console.log("loadContent", content);
     data.content = JSON.parse(content);
-    //console.log("loadContent", data.content.currentItemIndex);
+    console.log("loadContent", data.content);
     setTimeout(() => {
-        scrollToRow(idForRow(data.content.currentItemIndex));
-    }, 10);*/
+        scrollToRow(idForRow(data.content.current_item_index));
+    }, 10);
 
-    data.content = {
+    /*data.content = {
         currentItemIndex: 0,
         currentPath: 'C:\\',
         items: [
-            { displayName: 'file1.txt', displayExt: 'txt', size: '1KB', datetime: '2021-01-01 12:00:00', fullPath: 'C:\\file1.txt', linkPath: 'C:\\file1.txt' },
-            { displayName: 'file2.txt', displayExt: 'txt', size: '2KB', datetime: '2021-01-01 12:00:00', fullPath: 'C:\\file2.txt', linkPath: 'C:\\file2.txt' },
-            { displayName: 'file3.txt', displayExt: 'txt', size: '3KB', datetime: '2021-01-01 12:00:00', fullPath: 'C:\\file3.txt', linkPath: 'C:\\file3.txt' },
-            { displayName: 'file4.txt', displayExt: 'txt', size: '4KB', datetime: '2021-01-01 12:00:00', fullPath: 'C:\\file4.txt', linkPath: 'C:\\file4.txt' },
-            { displayName: 'file5.txt', displayExt: 'txt', size: '5KB', datetime: '2021-01-01 12:00:00', fullPath: 'C:\\file5.txt', linkPath: 'C:\\file5.txt' },
-            { displayName: 'file6.txt', displayExt: 'txt', size: '6KB', datetime: '2021-01-01 12:00:00', fullPath: 'C:\\file6.txt', linkPath: 'C:\\file6.txt' },
-            { displayName: 'file7.txt', displayExt: 'txt', size: '7KB', datetime: '2021-01-01 12:00:00', fullPath: 'C:\\file7.txt', linkPath: 'C:\\file7.txt' },
-            { displayName: 'file8.txt', displayExt: 'txt', size: '8KB', datetime: '2021-01-01 12:00:00', fullPath: 'C:\\file8.txt', linkPath: 'C:\\file8.txt' },
-            { displayName: 'file9.txt', displayExt: 'txt', size: '9KB', datetime: '2021-01-01 12:00:00', fullPath: 'C:\\file9.txt', linkPath: 'C:\\file9.txt' },
-            { displayName: 'file10.txt', displayExt: 'txt', size: '10KB', datetime: '2021-01-01 12:00:00', fullPath: 'C:\\file10.txt', linkPath: 'C:\\file10.txt' },
-            { displayName: 'file11.txt', displayExt: 'txt', size: '11KB', datetime: '2021-01-01 12:00:00', fullPath: 'C:\\file11.txt', linkPath: 'C:\\file11.txt' },
-            { displayName: 'file12.txt', displayExt: 'txt', size: '12KB', datetime: '2021-01-01 12:00:00', fullPath: 'C:\\file12.txt', linkPath: 'C:\\file12.txt' },
-            { displayName: 'file13.txt', displayExt: 'txt', size: '13KB', datetime: '2021-01-01 12:00:00', fullPath: 'C:\\file13.txt', linkPath: 'C:\\file13.txt' },
-            { displayName: 'file14.txt', displayExt: 'txt', size: '14KB', datetime: '2021-01-01 12:00:00', fullPath: 'C:\\file14.txt', linkPath: 'C:\\file14.txt' },
-            { displayName: 'file15.txt', displayExt: 'txt', size: '15KB', datetime: '2021-01-01 12:00:00', fullPath: 'C:\\file15.txt', linkPath: 'C:\\file15.txt' },
-            { displayName: 'file16.txt', displayExt: 'txt', size: '16KB', datetime: '2021-01-01 12:00:00', fullPath: 'C:\\file16.txt', linkPath: 'C:\\file16.txt' },
-            { displayName: 'file17.txt', displayExt: 'txt', size: '17KB', datetime: '2021-01-01 12:00:00', fullPath: 'C:\\file17.txt', linkPath: 'C:\\file17.txt' },
+            { display_name: 'file1.txt', display_ext: 'txt', size: '1KB', datetime: '2021-01-01 12:00:00', full_path: 'C:\\file1.txt', link_path: 'C:\\file1.txt' },
+            { display_name: 'file2.txt', display_ext: 'txt', size: '2KB', datetime: '2021-01-01 12:00:00', full_path: 'C:\\file2.txt', link_path: 'C:\\file2.txt' },
+            { display_name: 'file3.txt', display_ext: 'txt', size: '3KB', datetime: '2021-01-01 12:00:00', full_path: 'C:\\file3.txt', link_path: 'C:\\file3.txt' },
     ]
-        }
+        }*/
 }
 
 const idForRow = (index) => {
@@ -210,13 +202,13 @@ const tableVisibleItemsCount = () => {
 }
 
 const currentItem = () => {
-    return data.content.items[data.content.currentItemIndex];
+    return data.content.items[data.content.current_item_index];
 }
 
 const styleForItem = (index) => {
     if (props.isActive == true) {
         return {
-            backgroundColor: index === data.content.currentItemIndex ? '#444' : '#00000000'
+            backgroundColor: index === data.content.current_item_index ? '#444' : '#00000000'
         }
     }
     return {}
@@ -322,6 +314,44 @@ const styleForColumn = (column, type) => {
 
 loadContent();
 
+const getCurrentItemFullPath = () => {
+    if (data == null) {
+        return '';
+    }
+    if (data.content == null) {
+        return '';
+    }
+    if (data.content.items.length == 0) {
+        return '';
+    }
+    if (data.content.current_item_index < 0) {
+        return '';
+    }
+    if (data.content.current_item_index >= data.content.items.length) {
+        return '';
+    }
+    return data.content.items[data.content.current_item_index].full_path;
+}
+
+const getCurrentItemLinkPath = () => {
+    if (data == null) {
+        return '';
+    }
+    if (data.content == null) {
+        return '';
+    }
+    if (data.content.items.length == 0) {
+        return '';
+    }
+    if (data.content.current_item_index < 0) {
+        return '';
+    }
+    if (data.content.current_item_index >= data.content.items.length) {
+        return '';
+    }
+    return data.content.items[data.content.current_item_index].link_path;
+}
+
 </script>
 
 <template>
@@ -343,9 +373,9 @@ loadContent();
                     <tbody>
                         <tr :id="idForRow(index)" v-for="(file, index) in data.content.items" :key="index"
                             @click="onClickItem(index)" @dblclick="onDblClickItem(index)" :style="styleForItem(index)">
-                            <td :style="styleForColumn('filename', 'header')" class="fileName">{{ file.displayName }}
+                            <td :style="styleForColumn('filename', 'header')" class="fileName">{{ file.display_name }}
                             </td>
-                            <td :style="styleForColumn('ext', 'header')" class="fileName">{{ file.displayExt }}</td>
+                            <td :style="styleForColumn('ext', 'header')" class="fileName">{{ file.display_ext }}</td>
                             <td :style="styleForColumn('size', 'header')" class="fileSize">{{ file.size }}</td>
                             <td :style="styleForColumn('datetime', 'header')" class="fileSize">{{ file.datetime }}</td>
                         </tr>
@@ -355,10 +385,10 @@ loadContent();
         </div>
         <div :style="styleForFooter()">
             <div style="font-size: 12px;">
-                Full path: {{ currentItem().fullPath }}
+                Full path: {{ getCurrentItemFullPath() }}
             </div>
             <div style="font-size: 12px;">
-                Link path: {{ currentItem().linkPath }}
+                Link path: {{ getCurrentItemLinkPath() }}
             </div>
         </div>
     </div>
